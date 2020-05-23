@@ -16,8 +16,8 @@ void setup() {
 	size(1250, 750);
 	background(115);
 	rectMode(CENTER);
-	p1Paddle = new Paddle(250, 400, 20, 100);
-	p2Paddle = new Paddle(1000, 400, 20, 100);
+	p1Paddle = new Paddle(125, 400, 20, 100);
+	p2Paddle = new Paddle(1125, 400, 20, 100);
 	ball = new Ball(625, 400, 25);
 }
 
