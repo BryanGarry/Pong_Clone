@@ -38,6 +38,8 @@ void draw() {
 	level.show();
 
 	ball.move();
+	p1Paddle.move();
+	p2Paddle.move();
 
 	detectCollision();
 }
@@ -53,6 +55,44 @@ void detectCollision() {
 			ball._angleDeg = 90;
 		} else {
 			ball._angleDeg = 90 - (ball._angleDeg - 270);
+		}
+	}
+
+	// Check bottom rail
+	if (ball._yCord + ball._radius / 2 >= level._yCordBottomRail - level._railHeight / 2) {
+		// Check to see which direction the ball is headed and flip accordingly
+		if (ball._angleDeg == 90) {
+			ball._angleDeg = 270;
+		} else {
+			ball._angleDeg = 270 - (ball._angleDeg - 90);
+		}
+	}
+
+	// Check player 1 paddle
+	if (ball._xCord - ball._radius / 2 <= p1Paddle._xCord + p1Paddle._width / 2) {
+		if (ball._yCord > p1Paddle._yCord - p1Paddle._height / 2 && ball._yCord < p1Paddle._yCord + p1Paddle._height / 2) {
+			// Check to see which direction the ball is headed and flip accordingly
+			if (ball._angleDeg == 180) {
+				ball._angleDeg = 0;
+			} else if (ball._angleDeg < 180) {
+				ball._angleDeg = 0 - (ball._angleDeg - 180);
+			} else {
+				ball._angleDeg = 360 - (ball._angleDeg - 180);
+			}
+		}
+	}
+
+	// Check player 2 paddle
+	if (ball._xCord + ball._radius / 2 >= p2Paddle._xCord - p2Paddle._width / 2) {
+		if (ball._yCord > p2Paddle._yCord - p2Paddle._height / 2 && ball._yCord < p2Paddle._yCord + p2Paddle._height / 2) {
+			// Check to see which direction the ball is headed and flip accordingly
+			if (ball._angleDeg == 0) {
+				ball._angleDeg = 180;
+			} else if (ball._angleDeg < 360 && ball._angleDeg > 270) {
+				ball._angleDeg = 180 - (ball._angleDeg - 360);
+			} else {
+				ball._angleDeg = 180 - (ball._angleDeg - 0);
+			}
 		}
 	}
 }
