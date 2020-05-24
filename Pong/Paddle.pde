@@ -10,10 +10,19 @@ public class Paddle {
 	int _yCord;
 	int _width;
 	int _height;
+	int _velocity = 3;
 
 	// Methods
 	void show() {
 		rect(_xCord, _yCord, _width, _height);
+	}
+
+	void move(int code) {
+		if (code == -1) {
+			_yCord = _yCord - _velocity;
+		} else if (code == 1) {
+			_yCord = _yCord + _velocity;
+		}
 	}
 
 	// Constructors

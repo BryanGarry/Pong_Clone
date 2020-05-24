@@ -8,11 +8,7 @@ SUMMARY: THIS IS MEANT TO BE A CLONE OF THE FAMOUS GAME PONG
 
 // Variables
 Paddle p1Paddle;
-boolean p1UP;
-boolean p1DOWN;
 Paddle p2Paddle;
-boolean p2UP; 
-boolean p2DOWN;
 Ball ball;
 Level level;
 
@@ -21,15 +17,11 @@ void setup() {
 	size(1250, 750);
 	background(115);
 	rectMode(CENTER);
-	fill(0);
-	textAlign(CENTER, CENTER);
-	textSize((width+height)/30);
-	text("WELCOME TO PONG", width / 2, height / 10);
 
-  	int p1PosX = (int)(width * 0.1);
-  	int p2PosX = (int)(width * 0.9);
-  	int startPosY = (int)(height * 0.55);
-  	int ballPosX = (int)(width * 0.5);
+  int p1PosX = (int)(width * 0.1);
+ 	int p2PosX = (int)(width * 0.9);
+ 	int startPosY = (int)(height * 0.55);
+ 	int ballPosX = (int)(width * 0.5);
 
 	p1Paddle = new Paddle(p1PosX, startPosY, 20, 100);
 	p2Paddle = new Paddle(p2PosX, startPosY, 20, 100);
@@ -50,8 +42,6 @@ void draw() {
 	paddleMovement();
 
 	detectCollision();
-
-	text("WELCOME TO PONG", width / 2, height / 11);
 }
 
 // Logic to move the player paddles
@@ -63,18 +53,24 @@ void paddleMovement() {
 	1	:	move downwards a.k.a. in the positive y-direction
 	*/
 
-	if (p1UP == true && p1Paddle._yCord - p1Paddle._height / 2 > level._yCordTopRail + level._railHeight / 2) {
-		p1Paddle.move(-1);
+	// Player 1 Inputs
+	if (keyPressed) {
+		if (key == 'w' && p1Paddle._yCord - p1Paddle._height / 2 > level._yCordTopRail + level._railHeight / 2) {
+			p1Paddle.move(-1);
+		} else if (key == 's' && p1Paddle._yCord + p1Paddle._height / 2 < level._yCordBottomRail - level._railHeight / 2) {
+			p1Paddle.move(1);
+		}
 	}
-	if (p1DOWN == true && p1Paddle._yCord + p1Paddle._height / 2 < level._yCordBottomRail - level._railHeight / 2) {
-		p1Paddle.move(1);
+
+	// Player 2 Inputs
+	if (keyPressed) {
+		if (key == 'o' && p1Paddle._yCord - p1Paddle._height / 2 > level._yCordTopRail + level._railHeight / 2) {
+			p1Paddle.move(-1);
+		} else if (key == 'l' && p1Paddle._yCord + p1Paddle._height / 2 < level._yCordBottomRail - level._railHeight / 2) {
+			p1Paddle.move(1);
+		}
 	}
-	if (p2UP == true && p2Paddle._yCord - p2Paddle._height / 2 > level._yCordTopRail + level._railHeight / 2) {
-		p2Paddle.move(-1);
-	}
-	if (p2DOWN == true && p2Paddle._yCord + p2Paddle._height / 2 < level._yCordBottomRail - level._railHeight / 2) {
-		p2Paddle.move(1);
-	}
+
 }
 
 
@@ -128,35 +124,5 @@ void detectCollision() {
 				ball._angleDeg = 180 - (ball._angleDeg - 0);
 			}
 		}
-	}
-}
-
-public void keyPressed() {
-	if (key == 'w') {
-		p1UP = true;
-	}
-	if (key == 's') {
-		p1DOWN = true;
-	}
-	if (key == 'o') {
-		p2UP = true;
-	}
-	if (key == 'l') {
-		p2DOWN = true;
-	}
-}
-
-public void keyReleased() {
-	if (key == 'w') {
-		p1UP = false;
-	}
-	if (key == 's') {
-		p1DOWN = false;
-	}
-	if (key == 'o') {
-		p2UP = false;
-	}
-	if (key == 'l') {
-		p2DOWN = false;
 	}
 }

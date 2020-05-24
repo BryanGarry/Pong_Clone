@@ -16,6 +16,7 @@ public class Ball {
 	boolean _serve = true;
 	boolean _serveDirection = true;	// This boolean is true if serve is to the right, false if to the left
 
+
 	// Methods
 	void show() {
 		circle(_xCord, _yCord, _radius);
@@ -43,7 +44,7 @@ public class Ball {
 		_xVelocity = (int) (cos(_angleRad) * _velocity);
 		_yVelocity = (int) (sin(_angleRad) * _velocity);
 	}
-	
+
 
 	// Constructors
 	public Ball() {}
