@@ -1,4 +1,4 @@
-/*
+swsswsswswswsswsswsswssws/*
 PONG CLONE
 
 AUTHOR: BRYAN GARRY
@@ -111,44 +111,71 @@ void draw() {
  		if (gameVersion == 1) {
  			if (triggerServe) {
  				displayGame(); // Display game
-
- 				// Get serve direction and set timer for countdown
  				if (serve != 0) {
- 					startRound();
- 					timer._time = 1.0;
- 					textSize(150);
+ 					startRound(); // Get serve direction
+ 					timer._time = 3; // Set serve timer
+ 					textSize(200);
  					fill(0);
  				}
-
- 				// If timer is still running, proceed to display the countdown, once timer ends, switch to regular gameplay
- 				if (timer._time > 0) {
- 					if (timer._time > 0.67) {
- 						text("3", (int)(width * 0.33), (int)(height * 0.35));
- 					} else if (timer._time > 0.33) {
+ 				if (timer._time != 0) {
+ 					if (timer._time > 2) {
+ 						text("3", (int)(width * 0.5), (int)(height * 0.35));
+ 					} else if (timer._time > 1) {
  						text("2", (int)(width * 0.5), (int)(height * 0.35));
  					} else {
- 						text("1", (int)(width * 0.67), (int)(height * 0.35));
+ 						text("1", (int)(width * 0.5), (int)(height * 0.35));
  					}
  					timer.countDown();
  				} else {
  					triggerServe = false;
  				}
  			} else {
- 				playGame();
+ 				displayGame();
+				ball.move();
+				paddleMovement();
+				detectCollision();
  			}
+ 			//displayServeCountdown();
+
+ 			/*// Display the critical parts of the game
+ 			displayGame();
+
+			// Check if the ball needs to be served
+			if (serve != 0) {
+				startRound();
+				serveOffset = 1;
+			}
+
+			if (serveOffset == 2) {
+				int totalTime = 1000;
+				int savedTime = millis();
+				int passedTime = 0;
+				while(passedTime < totalTime) {
+					displayServeCountdown();
+					passedTime = millis() - savedTime;
+					System.out.println("TIMER RUNNING: " + passedTime);
+				}
+				serveOffset = 0;
+			}
+
+			// Calculate the movement for the next frame of the game
+			ball.move();
+			paddleMovement();
+
+			// Check to see if the ball collided with the rails or the paddles and reflect
+			detectCollision();
+
+			// Check to see if a player scored a point
+
+			// Correct the serve counter offset with the draw loop
+			if (serveOffset == 1) {
+				serveOffset++;
+			}*/
  		}
  	} else if (gameState == 2) {
 
  	}
 
-}
-
-// Logic to call to simply play the game
-void playGame() {
-	displayGame();
-	ball.move();
-	paddleMovement();
-	detectCollision();
 }
 
 // Logic to display the start menu of the game
@@ -194,6 +221,29 @@ void displayGame() {
 	p2Paddle.show();
 	ball.show();
 	level.show();
+}
+
+// Function that displays the countdown before a serve is released
+void displayServeCountdown() {
+	// Show base game
+	displayGame();
+
+	// Set up timer and display settings
+	int totalTime = 3000;
+	int savedTime = millis();
+	int passedTime = 0;
+	fill(0);
+	textSize(200);
+	while(passedTime < totalTime) {
+		if (passedTime < 1000 && passedTime >= 0) {
+			text("3", (int)(width * 0.5), (int)(height * 0.35));
+		} else if (passedTime < 2000 && passedTime >= 1000) {
+			text("2", (int)(width * 0.5), (int)(height * 0.35));
+		} else {
+			text("1", (int)(width * 0.5), (int)(height * 0.35));
+		}
+		passedTime = millis() - savedTime;
+	}
 }
 
 // Logic to move the player paddles
@@ -284,6 +334,21 @@ void startRound() {
 		ball._angleDeg = 0.0;
 		serve = 0;
 	}
+}
+
+// Function that is used to display the countdown for when the ball is about to be served
+void serveCountdown() {
+		// Set up a timer to run that displays the countdown
+		int totalTime = 1000;
+		int savedTime = millis();
+		int passedTime = 0;
+		while(passedTime < totalTime) {
+			fill(0);
+			textSize(20);
+			text("3", (int)(width * 0.5), (int)(height * 0.55));
+			passedTime = millis() - savedTime;
+			System.out.println("TIMER RUNNING: " + passedTime);
+		}
 }
 
 public void keyPressed() {

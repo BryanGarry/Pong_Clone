@@ -13,8 +13,6 @@ public class Ball {
 	int _yVelocity;
 	float _angleDeg;
 	float _angleRad;
-	boolean _serve = true;
-	boolean _serveDirection = true;	// This boolean is true if serve is to the right, false if to the left
 
 
 	// Methods
@@ -23,17 +21,6 @@ public class Ball {
 	}
 
 	void move() {
-		// Check to see if the ball needs to be served
-		if (_serve == true) {
-			if (_serveDirection == true) {
-				_angleDeg = 315.0;		// Serve the ball to the right
-			} else {
-				_angleDeg = 180.0;		// Serve the ball to the left
-			}
-			_serve = false;
-		}
-
-		// If the ball is already served then move the ball accordingly
 		calculateVelocityComponents();
 		_xCord = _xCord + _xVelocity;
 		_yCord = _yCord + _yVelocity;
