@@ -51,6 +51,11 @@ Ball ball;
 int serve;
 boolean triggerServe;
 
+int p1PosX;
+int p2PosX;
+int startPosY;
+int ballPosX;
+
 Level level;
 
 int gameState;
@@ -58,6 +63,8 @@ int gameVersion;
 boolean roundStart;
 
 Timer timer;
+
+int winningScore;
 
 ArrayList<Button> buttonList = new ArrayList<Button>();
 
@@ -72,12 +79,12 @@ void setup() {
   	int p1PosX = (int)(width * 0.1);
   	int p2PosX = (int)(width * 0.9);
   	int startPosY = (int)(height * 0.55);
-  	int startPosX = (int)(width * 0.5);
+  	int ballPosX = (int)(width * 0.5);
 
   	// Create paddles, ball, and level objects
 	p1Paddle = new Paddle(p1PosX, startPosY, 20, 100);
 	p2Paddle = new Paddle(p2PosX, startPosY, 20, 100);
-	ball = new Ball(startPosX, startPosY, 25);
+	ball = new Ball(ballPosX, startPosY, 25);
 	level = new Level();
 
 	// Set game state equal to 0 to load the menu UI
@@ -87,15 +94,15 @@ void setup() {
 	serve = 1;
 	triggerServe = true;
 
-	// Set the default round status to false
-	roundStart = false;
-
 	// Set the timer to a default time of 1 second
 	timer = new Timer(1);
 
 	// Set players scores to 0
 	p1Score = 0;
 	p2Score = 0;
+
+	// Set the winning score
+	winningScore = 1;
 
 	// Add buttons to button list for start menu
 	buttonList.add(new Button("PLAY (1P)", (int)(width * 0.5), (int)(height * 0.4), (int)(width * 0.2), (int)(height * 0.08), 0));
@@ -109,7 +116,7 @@ void setup() {
 
 // Continually updates the game each frame
 void draw() {
- 	background(115); // Background is drawn after every frame to get the window updated
+ 	//background(115); // Background is drawn after every frame to get the window updated
 
  	if (gameState == 0) {
  		displayMenu();
@@ -118,7 +125,7 @@ void draw() {
  			if (triggerServe) {
  				displayGame(); // Display game
 
- 				// Get serve direction and set timer for countdown
+ 				// Get serve direction and set timer for countdown as well as the starting positions of the paddles and balls
  				if (serve != 0) {
  					startRound();
  					timer._time = 1.0;
@@ -141,6 +148,7 @@ void draw() {
  				}
  			} else {
  				playGame();
+ 				checkForWinner();
  			}
  		}
  	} else if (gameState == 2) {
@@ -155,10 +163,12 @@ void playGame() {
 	ball.move();
 	paddleMovement();
 	detectCollision();
+	checkPointScored();
 }
 
 // Logic to display the start menu of the game
 void displayMenu() {
+	background(115);
 	noStroke();
 	fill(255);
 	textAlign(CENTER, CENTER);
@@ -196,11 +206,7 @@ void displayButton(String message, int x, int y, int w, int h) {
 // Function that displays the objects in the game in the correct order
 void displayGame() {
 	background(115);
-	textSize(50);
-	text("Player 1:", (int)(width * 0.2), (int)(height * 0.04));
-	text(p1Score, (int)(width * 0.2), (int)(height * 0.12));
-	text("Player 2:", (int)(width * 0.8), (int)(height * 0.04));
-	text(p2Score, (int)(width * 0.8), (int)(height * 0.12));
+	drawPlayerScores();
 	p1Paddle.show();
 	p2Paddle.show();
 	ball.show();
@@ -284,8 +290,48 @@ void detectCollision() {
 	}
 }
 
+// Function that checks if a player has scored a point and then resets the game to begin another round
+void checkPointScored() {
+	// Check if player 1 scored a point on player 2
+	if (ball._xCord + ball._radius / 2 > p2Paddle._xCord + p2Paddle._width / 3) {
+		p1Score++;
+		serve = 2;
+		resetRound();
+	}
+
+	// Check if player 2 scored a point on player 1
+	if (ball._xCord - ball._radius / 2 < p1Paddle._xCord + p1Paddle._width / 3) {
+		p2Score++;
+		serve = 1;
+		resetRound();
+	}
+}
+
+// Function that draws the players scores in the heading
+void drawPlayerScores() {
+	textSize(50);
+	text("Player 1:", (int)(width * 0.2), (int)(height * 0.04));
+	text(p1Score, (int)(width * 0.2), (int)(height * 0.12));
+	text("Player 2:", (int)(width * 0.8), (int)(height * 0.04));
+	text(p2Score, (int)(width * 0.8), (int)(height * 0.12));
+}
+
+// Function that resets are the necessary values at the end of the round
+void resetRound() {
+	triggerServe = true;
+	ball._xCord = (int)(width * 0.5);
+	ball._yCord = (int)(height * 0.55);
+	p1Paddle._yCord = (int)(height * 0.55);
+	p2Paddle._yCord = (int)(height * 0.55);
+}
+
 // Function called to serve the ball in a given direction based on the serve int state
 void startRound() {
+	// Reset the players and balls starting positions
+	//ball._xCord = ballPosX;
+	//ball._yCord = startPosY;
+
+	// Determine the direction of the serve
 	if (serve == 1) {
 		// Serve the ball to player 1
 		ball._angleDeg = 180.0;
@@ -294,6 +340,26 @@ void startRound() {
 		// Serve the ball to player 2
 		ball._angleDeg = 0.0;
 		serve = 0;
+	}
+}
+
+// Function that checks to see if a player won the game
+void checkForWinner() {
+	if (p1Score == winningScore) {
+		resetRound();
+		displayGame();
+		textSize(150);
+ 		fill(0);
+		text("PLAYER 1 WINS", (int)(width * 0.5), (int)(height * 0.35));
+		gameState = 2;
+	}
+	if (p2Score == winningScore) {
+		resetRound();
+		displayGame();
+		textSize(150);
+ 		fill(0);
+		text("PLAYER 2 WINS", (int)(width * 0.5), (int)(height * 0.35));
+		gameState = 2;
 	}
 }
 
