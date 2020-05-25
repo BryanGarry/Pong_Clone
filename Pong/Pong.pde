@@ -40,10 +40,12 @@ import java.util.*;
 Paddle p1Paddle;
 boolean p1UP;
 boolean p1DOWN;
+int p1Score;
 
 Paddle p2Paddle;
 boolean p2UP; 
 boolean p2DOWN;
+int p2Score;
 
 Ball ball;
 int serve;
@@ -91,6 +93,10 @@ void setup() {
 	// Set the timer to a default time of 1 second
 	timer = new Timer(1);
 
+	// Set players scores to 0
+	p1Score = 0;
+	p2Score = 0;
+
 	// Add buttons to button list for start menu
 	buttonList.add(new Button("PLAY (1P)", (int)(width * 0.5), (int)(height * 0.4), (int)(width * 0.2), (int)(height * 0.08), 0));
 	buttonList.add(new Button("PLAY (2P)", (int)(width * 0.5), (int)(height * 0.5), (int)(width * 0.2), (int)(height * 0.08), 1));
@@ -116,12 +122,12 @@ void draw() {
  				if (serve != 0) {
  					startRound();
  					timer._time = 1.0;
- 					textSize(150);
- 					fill(0);
  				}
 
  				// If timer is still running, proceed to display the countdown, once timer ends, switch to regular gameplay
  				if (timer._time > 0) {
+ 					textSize(150);
+ 					fill(0);
  					if (timer._time > 0.67) {
  						text("3", (int)(width * 0.33), (int)(height * 0.35));
  					} else if (timer._time > 0.33) {
@@ -190,6 +196,11 @@ void displayButton(String message, int x, int y, int w, int h) {
 // Function that displays the objects in the game in the correct order
 void displayGame() {
 	background(115);
+	textSize(50);
+	text("Player 1:", (int)(width * 0.2), (int)(height * 0.04));
+	text(p1Score, (int)(width * 0.2), (int)(height * 0.12));
+	text("Player 2:", (int)(width * 0.8), (int)(height * 0.04));
+	text(p2Score, (int)(width * 0.8), (int)(height * 0.12));
 	p1Paddle.show();
 	p2Paddle.show();
 	ball.show();
