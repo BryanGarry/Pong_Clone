@@ -8,7 +8,7 @@ public class Ball {
 	int _xCord;
 	int _yCord;
 	int _radius;
-	int _velocity = 5;
+	int _velocity = 3;
 	int _xVelocity;
 	int _yVelocity;
 	float _angleDeg;

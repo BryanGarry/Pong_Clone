@@ -109,6 +109,9 @@ void setup() {
 	// Initialize the random number generator
 	rng = new Random();
 
+	// Set frame rate so game runs smoothly
+	frameRate(120);
+
 	// Add buttons to button list for start menu
 	buttonList.add(new Button("PLAY (1P)", (int)(width * 0.5), (int)(height * 0.4), (int)(width * 0.2), (int)(height * 0.08), 0));
 	buttonList.add(new Button("PLAY (2P)", (int)(width * 0.5), (int)(height * 0.5), (int)(width * 0.2), (int)(height * 0.08), 1));
@@ -154,6 +157,7 @@ void draw() {
  			} else {
  				playGame();
  				checkForWinner();
+ 				System.out.println(ball._angleDeg);
  			}
  		}
  	} else if (gameState == 2) {
@@ -269,13 +273,32 @@ void detectCollision() {
 	// Check player 1 paddle
 	if (ball._xCord - ball._radius / 2 <= p1Paddle._xCord + p1Paddle._width / 2) {
 		if (ball._yCord > p1Paddle._yCord - p1Paddle._height / 2 && ball._yCord < p1Paddle._yCord + p1Paddle._height / 2) {
+			// Get a gaussian to apply to the paddle collisons to let the ball change angle based on where it hits the paddle
+			int yDif = ball._yCord - p1Paddle._yCord;
+			float offset = (float)rng.nextGaussian()*yDif+0;
+
 			// Check to see which direction the ball is headed and flip accordingly
 			if (ball._angleDeg == 180) {
-				ball._angleDeg = 0;
+				offset = (float)rng.nextGaussian()*10+0;
+				ball._angleDeg = 0 + offset;
 			} else if (ball._angleDeg < 180) {
-				ball._angleDeg = 0 - (ball._angleDeg - 180);
+				if (yDif > 0) {
+					ball._angleDeg = 0 - (ball._angleDeg - 180) + abs(offset);
+				} else if (yDif < 0) {
+					ball._angleDeg = 0 - (ball._angleDeg - 180) - abs(offset);
+				} else {
+					offset = (float)rng.nextGaussian()*5+0;
+					ball._angleDeg = 0 - (ball._angleDeg - 180) + offset;
+				}
 			} else {
-				ball._angleDeg = 360 - (ball._angleDeg - 180);
+				if (yDif > 0) {
+					ball._angleDeg = 360 - (ball._angleDeg - 180) + abs(offset);
+				} else if (yDif < 0) {
+					ball._angleDeg = 360 - (ball._angleDeg - 180) - abs(offset);
+				} else {
+					offset = (float)rng.nextGaussian()*5+0;
+					ball._angleDeg = 360 - (ball._angleDeg - 180) + offset;
+				}
 			}
 		}
 	}
@@ -283,13 +306,32 @@ void detectCollision() {
 	// Check player 2 paddle
 	if (ball._xCord + ball._radius / 2 >= p2Paddle._xCord - p2Paddle._width / 2) {
 		if (ball._yCord > p2Paddle._yCord - p2Paddle._height / 2 && ball._yCord < p2Paddle._yCord + p2Paddle._height / 2) {
+			// Get a gaussian to apply to the paddle collisons to let the ball change angle based on where it hits the paddle
+			int yDif = ball._yCord - p2Paddle._yCord;
+			float offset = (float)rng.nextGaussian()*yDif+0;
+
 			// Check to see which direction the ball is headed and flip accordingly
 			if (ball._angleDeg == 0) {
-				ball._angleDeg = 180;
+				offset = (float)rng.nextGaussian()*10+0;
+				ball._angleDeg = 180 + offset;
 			} else if (ball._angleDeg < 360 && ball._angleDeg > 270) {
-				ball._angleDeg = 180 - (ball._angleDeg - 360);
+				if (yDif > 0) {
+					ball._angleDeg = 180 - (ball._angleDeg - 360) - abs(offset);
+				} else if (yDif < 0) {
+					ball._angleDeg = 180 - (ball._angleDeg - 360) + abs(offset);
+				} else {
+					offset = (float)rng.nextGaussian()*5+0;
+					ball._angleDeg = 180 - (ball._angleDeg - 360) + offset;
+				}
 			} else {
-				ball._angleDeg = 180 - (ball._angleDeg - 0);
+				if (yDif > 0) {
+					ball._angleDeg = 180 - (ball._angleDeg - 0) - abs(offset);
+				} else if (yDif < 0) {
+					ball._angleDeg = 180 - (ball._angleDeg - 0) + abs(offset);
+				} else {
+					offset = (float)rng.nextGaussian()*5+0;
+					ball._angleDeg = 180 - (ball._angleDeg - 0) + offset;
+				}
 			}
 		}
 	}
