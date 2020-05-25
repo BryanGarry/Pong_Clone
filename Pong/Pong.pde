@@ -66,6 +66,8 @@ Timer timer;
 
 int winningScore;
 
+Random rng;
+
 ArrayList<Button> buttonList = new ArrayList<Button>();
 
 // Called to set up the game on the first frame
@@ -103,6 +105,9 @@ void setup() {
 
 	// Set the winning score
 	winningScore = 1;
+
+	// Initialize the random number generator
+	rng = new Random();
 
 	// Add buttons to button list for start menu
 	buttonList.add(new Button("PLAY (1P)", (int)(width * 0.5), (int)(height * 0.4), (int)(width * 0.2), (int)(height * 0.08), 0));
@@ -327,18 +332,16 @@ void resetRound() {
 
 // Function called to serve the ball in a given direction based on the serve int state
 void startRound() {
-	// Reset the players and balls starting positions
-	//ball._xCord = ballPosX;
-	//ball._yCord = startPosY;
-
 	// Determine the direction of the serve
 	if (serve == 1) {
 		// Serve the ball to player 1
-		ball._angleDeg = 180.0;
+		float offset = (float)rng.nextGaussian()*15+0;
+		ball._angleDeg = 180.0 + offset;
 		serve = 0;
 	} else if (serve == 2) {
 		// Serve the ball to player 2
-		ball._angleDeg = 0.0;
+		float offset = (float)rng.nextGaussian()*15+0;
+		ball._angleDeg = 0.0 + offset;
 		serve = 0;
 	}
 }
