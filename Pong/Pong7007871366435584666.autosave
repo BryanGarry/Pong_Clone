@@ -78,8 +78,8 @@ void setup() {
 	rectMode(CENTER);
 
 	// Define the position of the players and ball
-  	int p1PosX = (int)(width * 0.2);
-  	int p2PosX = (int)(width * 0.8);
+  	int p1PosX = (int)(width * 0.1);
+  	int p2PosX = (int)(width * 0.9);
   	int startPosY = (int)(height * 0.55);
   	int ballPosX = (int)(width * 0.5);
 
@@ -104,7 +104,7 @@ void setup() {
 	p2Score = 0;
 
 	// Set the winning score
-	winningScore = 3;
+	winningScore = 1;
 
 	// Initialize the random number generator
 	rng = new Random();
@@ -157,10 +157,7 @@ void draw() {
  			} else {
  				playGame();
  				checkForWinner();
- 				// System.out.println("Paddle 1 Y: " + p1Paddle._yCord);
- 				// System.out.println("Paddle 2 Y: " + p2Paddle._yCord);
- 				// System.out.println("Ball Y: " + ball._yCord);
- 				//System.out.println(ball._angleDeg);
+ 				System.out.println(ball._angleDeg);
  			}
  		}
  	} else if (gameState == 2) {
@@ -264,7 +261,13 @@ void detectCollision() {
 		} else {
 			ball._angleDeg = (270 - ball._angleDeg) + 90;
 		}
-		ball.normalizeAngle();
+
+		/*// Check to see which direction the ball is headed and flip accordingly
+		if (ball._angleDeg == 270) {
+			ball._angleDeg = 90;
+		} else {
+			ball._angleDeg = 90 - (ball._angleDeg - 270);
+		}*/
 	}
 
 	// Check bottom rail
@@ -278,74 +281,28 @@ void detectCollision() {
 		} else {
 			ball._angleDeg = 270 - (ball._angleDeg - 90);
 		}
-		ball.normalizeAngle();
+
+		/*// Check to see which direction the ball is headed and flip accordingly
+		if (ball._angleDeg == 90) {
+			ball._angleDeg = 270;
+		} else {
+			ball._angleDeg = 270 - (ball._angleDeg - 90);
+		}*/
 	}
 
 
-	// Player 1 paddle collision detection and reflection
-	if (ball._xCord - ball._radius / 2 <= p1Paddle._xCord + p1Paddle._width / 2) {
-		if (ball._yCord > p1Paddle._yCord - p1Paddle._height / 2 && ball._yCord < p1Paddle._yCord + p1Paddle._height / 2) {
-			// Find the difference between the paddle center and the ball center and change the angle of the ball accordingly.
-			// Add this raw value to the newly calculated angle and then check to make sure the angle is still within the correct bounds.
-			int yDif = (int) (ball._yCord - p1Paddle._yCord);
-			int deltaAngle = (int)(yDif * 0.8);
-
-			System.out.println("------New Collision------");
-			System.out.println("Incoming Angle: " + ball._angleDeg);
-			System.out.println("P1 DeltaAngle: " + deltaAngle);
-
-			// If the ball is going upwards, that means the angle is between 180-270. The ball reflected must be between 270-360.
-			// If the ball is going downwards, that means the angle is between 90-180. The ball reflected must be between 0-90.
-			if (ball._angleDeg > 180 && ball._angleDeg < 270) {
-				ball._angleDeg = 270 + (270 - ball._angleDeg) + deltaAngle;
-				//ball.checkAngleRange(270, 360);
-			} else if (ball._angleDeg > 90 && ball._angleDeg < 180) {
-				ball._angleDeg = 90 - (ball._angleDeg - 90) + deltaAngle;
-				//ball.checkAngleRange(0, 90);
-			} else {
-				ball._angleDeg = ball._angleDeg + 180 + deltaAngle;
-			}
-			ball.normalizeAngle();
-
-			System.out.println("Outgoing Angle: " + ball._angleDeg);
-		}
-	}
-
-	// Player 2 paddle collison detection and reflection
-	if (ball._xCord + ball._radius / 2 >= p2Paddle._xCord - p2Paddle._width / 2) {
-		if (ball._yCord > p2Paddle._yCord - p2Paddle._height / 2 && ball._yCord < p2Paddle._yCord + p2Paddle._height / 2) {
-			// Find the difference between the paddle center and the ball center and change the angle of the ball accordingly.
-			// Add this raw value to the newly calculated angle and then check to make sure the angle is still within the correct bounds.
-			int yDif = (int) (ball._yCord - p2Paddle._yCord);
-			int deltaAngle = (int)(yDif * 0.8);
-
-			System.out.println("------New Collision------");
-			System.out.println("Incoming Angle: " + ball._angleDeg);
-			System.out.println("P2 DeltaAngle: " + deltaAngle);
-
-			// If the ball is going upwards, that means the angle is between 270-360. The ball reflected must be between 180-270.
-			// If the ball is going downwards, that means the angle is between 0-90. The ball reflected must be between 90-180.
-			if (ball._angleDeg > 270 && ball._angleDeg < 360) {
-				ball._angleDeg = 270 - (ball._angleDeg - 270) - deltaAngle;
-				//ball.checkAngleRange(180, 270);
-			} else if (ball._angleDeg > 0 && ball._angleDeg < 90) {
-				ball._angleDeg = 90 + (90 - ball._angleDeg) - deltaAngle;
-				//ball.checkAngleRange(90, 180);
-			} else {
-				ball._angleDeg = ball._angleDeg + 180;
-			}
-			ball.normalizeAngle();
-
-			System.out.println("Outgoing Angle: " + ball._angleDeg);
-		}
-	}
-
-
-	// Check player 1 paddle
+	// Updated player 1 paddle collision detection
 	/*if (ball._xCord - ball._radius / 2 <= p1Paddle._xCord + p1Paddle._width / 2) {
 		if (ball._yCord > p1Paddle._yCord - p1Paddle._height / 2 && ball._yCord < p1Paddle._yCord + p1Paddle._height / 2) {
+
+		}
+	}*/
+
+	// Check player 1 paddle
+	if (ball._xCord - ball._radius / 2 <= p1Paddle._xCord + p1Paddle._width / 2) {
+		if (ball._yCord > p1Paddle._yCord - p1Paddle._height / 2 && ball._yCord < p1Paddle._yCord + p1Paddle._height / 2) {
 			// Get a gaussian to apply to the paddle collisons to let the ball change angle based on where it hits the paddle
-			int yDif = abs(ball._yCord - p1Paddle._yCord);
+			int yDif = ball._yCord - p1Paddle._yCord;
 			float offset = (float)rng.nextGaussian()*yDif+0;
 
 			// Check to see which direction the ball is headed and flip accordingly
@@ -378,13 +335,13 @@ void detectCollision() {
 				}
 			}
 		}
-	}*/
+	}
 
 	// Check player 2 paddle
-	/*if (ball._xCord + ball._radius / 2 >= p2Paddle._xCord - p2Paddle._width / 2) {
+	if (ball._xCord + ball._radius / 2 >= p2Paddle._xCord - p2Paddle._width / 2) {
 		if (ball._yCord > p2Paddle._yCord - p2Paddle._height / 2 && ball._yCord < p2Paddle._yCord + p2Paddle._height / 2) {
 			// Get a gaussian to apply to the paddle collisons to let the ball change angle based on where it hits the paddle
-			int yDif = abs(ball._yCord - p2Paddle._yCord);
+			int yDif = ball._yCord - p2Paddle._yCord;
 			float offset = (float)rng.nextGaussian()*yDif+0;
 
 			// Check to see which direction the ball is headed and flip accordingly
@@ -411,22 +368,20 @@ void detectCollision() {
 				}
 			}
 		}
-	}*/
+	}
 }
 
 // Function that checks if a player has scored a point and then resets the game to begin another round
 void checkPointScored() {
 	// Check if player 1 scored a point on player 2
-	// if (ball._xCord + ball._radius / 2 > p2Paddle._xCord + p2Paddle._width / 3) {
-	if (ball._xCord + ball._radius / 2 > p2Paddle._xCord) {
+	if (ball._xCord + ball._radius / 2 > p2Paddle._xCord + p2Paddle._width / 3) {
 		p1Score++;
 		serve = 2;
 		resetRound();
 	}
 
 	// Check if player 2 scored a point on player 1
-	// if (ball._xCord - ball._radius / 2 < p1Paddle._xCord + p1Paddle._width / 3) {
-	if (ball._xCord - ball._radius / 2 < p1Paddle._xCord) {
+	if (ball._xCord - ball._radius / 2 < p1Paddle._xCord + p1Paddle._width / 3) {
 		p2Score++;
 		serve = 1;
 		resetRound();
@@ -465,13 +420,6 @@ void startRound() {
 		ball._angleDeg = 0.0 + offset;
 		serve = 0;
 	}
-
-	/*
-	---NOTE---
-	IT MIGHT BE WORTH LOOKING INTO SHIFTING THE MEAN OF THE GAUSIAN UP OR DOWN
-	IN ORDER TO GIVE MORE VARIETY TO THE SERVES. I COULD ALSO LOOK INTO SHIFTING
-	THE STD DEV AND JUST CAPPING THE MAX AMOUNT OF OFFSET THE SERVE COULD HAVE
-	*/
 }
 
 // Function that checks to see if a player won the game
