@@ -50,6 +50,7 @@ int p2Score;
 Ball ball;
 int serve;
 boolean triggerServe;
+float maxBallSpeed;
 
 int p1PosX;
 int p2PosX;
@@ -61,6 +62,8 @@ Level level;
 int gameState;
 int gameVersion;
 boolean roundStart;
+
+int volleyCount;
 
 Timer timer;
 
@@ -95,6 +98,12 @@ void setup() {
 	// Set the default serve to the player 1
 	serve = 1;
 	triggerServe = true;
+
+	// Set the maxBallSpeed
+	maxBallSpeed = 7;
+
+	// Set the volley count to 0
+	volleyCount = 0;
 
 	// Set the timer to a default time of 1 second
 	timer = new Timer(1);
@@ -157,10 +166,6 @@ void draw() {
  			} else {
  				playGame();
  				checkForWinner();
- 				// System.out.println("Paddle 1 Y: " + p1Paddle._yCord);
- 				// System.out.println("Paddle 2 Y: " + p2Paddle._yCord);
- 				// System.out.println("Ball Y: " + ball._yCord);
- 				//System.out.println(ball._angleDeg);
  			}
  		}
  	} else if (gameState == 2) {
@@ -298,14 +303,16 @@ void detectCollision() {
 			// If the ball is going downwards, that means the angle is between 90-180. The ball reflected must be between 0-90.
 			if (ball._angleDeg > 180 && ball._angleDeg < 270) {
 				ball._angleDeg = 270 + (270 - ball._angleDeg) + deltaAngle;
-				//ball.checkAngleRange(270, 360);
 			} else if (ball._angleDeg > 90 && ball._angleDeg < 180) {
 				ball._angleDeg = 90 - (ball._angleDeg - 90) + deltaAngle;
-				//ball.checkAngleRange(0, 90);
 			} else {
 				ball._angleDeg = ball._angleDeg + 180 + deltaAngle;
 			}
 			ball.normalizeAngle();
+
+			// Increase volley count
+			volleyCount++;
+			checkVolleyCount();
 
 			System.out.println("Outgoing Angle: " + ball._angleDeg);
 		}
@@ -327,91 +334,21 @@ void detectCollision() {
 			// If the ball is going downwards, that means the angle is between 0-90. The ball reflected must be between 90-180.
 			if (ball._angleDeg > 270 && ball._angleDeg < 360) {
 				ball._angleDeg = 270 - (ball._angleDeg - 270) - deltaAngle;
-				//ball.checkAngleRange(180, 270);
 			} else if (ball._angleDeg > 0 && ball._angleDeg < 90) {
 				ball._angleDeg = 90 + (90 - ball._angleDeg) - deltaAngle;
-				//ball.checkAngleRange(90, 180);
 			} else {
 				ball._angleDeg = ball._angleDeg + 180;
 			}
 			ball.normalizeAngle();
 
+			// Increase volley count
+			volleyCount++;
+			checkVolleyCount();
+
 			System.out.println("Outgoing Angle: " + ball._angleDeg);
 		}
 	}
 
-
-	// Check player 1 paddle
-	/*if (ball._xCord - ball._radius / 2 <= p1Paddle._xCord + p1Paddle._width / 2) {
-		if (ball._yCord > p1Paddle._yCord - p1Paddle._height / 2 && ball._yCord < p1Paddle._yCord + p1Paddle._height / 2) {
-			// Get a gaussian to apply to the paddle collisons to let the ball change angle based on where it hits the paddle
-			int yDif = abs(ball._yCord - p1Paddle._yCord);
-			float offset = (float)rng.nextGaussian()*yDif+0;
-
-			// Check to see which direction the ball is headed and flip accordingly
-			if (ball._angleDeg == 180) {
-				offset = (float)rng.nextGaussian()*20+0;
-				if (offset > 0) {
-					ball._angleDeg = 0 + offset;
-				} else if (offset < 0) {
-					ball._angleDeg = 360 + offset;
-				} else {
-					ball._angleDeg = 0;
-				}
-			} else if (ball._angleDeg < 180) {
-				if (yDif > 0) {
-					ball._angleDeg = 0 - (ball._angleDeg - 180) + abs(offset);
-				} else if (yDif < 0) {
-					ball._angleDeg = 0 - (ball._angleDeg - 180) - abs(offset);
-				} else {
-					offset = (float)rng.nextGaussian()*5+0;
-					ball._angleDeg = 0 - (ball._angleDeg - 180) + offset;
-				}
-			} else {
-				if (yDif > 0) {
-					ball._angleDeg = 360 - (ball._angleDeg - 180) + abs(offset);
-				} else if (yDif < 0) {
-					ball._angleDeg = 360 - (ball._angleDeg - 180) - abs(offset);
-				} else {
-					offset = (float)rng.nextGaussian()*5+0;
-					ball._angleDeg = 360 - (ball._angleDeg - 180) + offset;
-				}
-			}
-		}
-	}*/
-
-	// Check player 2 paddle
-	/*if (ball._xCord + ball._radius / 2 >= p2Paddle._xCord - p2Paddle._width / 2) {
-		if (ball._yCord > p2Paddle._yCord - p2Paddle._height / 2 && ball._yCord < p2Paddle._yCord + p2Paddle._height / 2) {
-			// Get a gaussian to apply to the paddle collisons to let the ball change angle based on where it hits the paddle
-			int yDif = abs(ball._yCord - p2Paddle._yCord);
-			float offset = (float)rng.nextGaussian()*yDif+0;
-
-			// Check to see which direction the ball is headed and flip accordingly
-			if (ball._angleDeg == 0) {
-				offset = (float)rng.nextGaussian()*20+0;
-				ball._angleDeg = 180 + offset;
-			} else if (ball._angleDeg < 360 && ball._angleDeg > 270) {
-				if (yDif > 0) {
-					ball._angleDeg = 180 - (ball._angleDeg - 360) - abs(offset);
-				} else if (yDif < 0) {
-					ball._angleDeg = 180 - (ball._angleDeg - 360) + abs(offset);
-				} else {
-					offset = (float)rng.nextGaussian()*5+0;
-					ball._angleDeg = 180 - (ball._angleDeg - 360) + offset;
-				}
-			} else {
-				if (yDif > 0) {
-					ball._angleDeg = 180 - (ball._angleDeg - 0) - abs(offset);
-				} else if (yDif < 0) {
-					ball._angleDeg = 180 - (ball._angleDeg - 0) + abs(offset);
-				} else {
-					offset = (float)rng.nextGaussian()*5+0;
-					ball._angleDeg = 180 - (ball._angleDeg - 0) + offset;
-				}
-			}
-		}
-	}*/
 }
 
 // Function that checks if a player has scored a point and then resets the game to begin another round
@@ -433,6 +370,19 @@ void checkPointScored() {
 	}
 }
 
+// Function that checks the volley count and increases the ball speed depending on the number of volleys
+void checkVolleyCount() {
+	if (volleyCount == 3) {
+		ball._velocity += 0.5;
+	} else if (volleyCount == 8) {
+		ball._velocity += 1.0;
+	} else if (volleyCount == 15) {
+		ball._velocity += 1.0;
+	} else {
+		return;
+	}
+}
+
 // Function that draws the players scores in the heading
 void drawPlayerScores() {
 	textSize(50);
@@ -449,6 +399,8 @@ void resetRound() {
 	ball._yCord = (int)(height * 0.55);
 	p1Paddle._yCord = (int)(height * 0.55);
 	p2Paddle._yCord = (int)(height * 0.55);
+	volleyCount = 0;
+	ball._velocity = 2;
 }
 
 // Function called to serve the ball in a given direction based on the serve int state

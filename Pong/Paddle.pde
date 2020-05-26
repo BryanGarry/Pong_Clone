@@ -10,7 +10,7 @@ public class Paddle {
 	int _yCord;
 	int _width;
 	int _height;
-	int _velocity = 2;
+	int _velocity = 3;
 
 	// Methods
 	void show() {
