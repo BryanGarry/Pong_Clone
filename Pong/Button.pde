@@ -9,6 +9,7 @@ that corresponds to the action that pressing the button will result in. The code
 3	:	Highscore
 4	:	Credits
 5	:	Exit
+6	:	CPU only game
 
 Depending on the code, the appropriate action will be taken by the game. The reason this is done
 is so that each buttons function can be stored in the same object type to simplify the conditional

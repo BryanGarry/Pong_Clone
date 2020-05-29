@@ -26,6 +26,7 @@ import java.util.*;
 	3	:	Highscore
 	4	:	Credits
 	5	:	Exit
+	6	:	CPU only game
 
 	The integer serve is being used to determine which direction the ball should be served from, if it needs to even
 	be served at all. The breakdown of what each number corresponds to will be listed below:
@@ -138,10 +139,11 @@ void setup() {
 	// Add buttons to button list for start menu
 	buttonList.add(new Button("PLAY (1P)", (int)(width * 0.5), (int)(height * 0.4), (int)(width * 0.2), (int)(height * 0.08), 0));
 	buttonList.add(new Button("PLAY (2P)", (int)(width * 0.5), (int)(height * 0.5), (int)(width * 0.2), (int)(height * 0.08), 1));
-	buttonList.add(new Button("OPTIONS", width / 2, (int)(height * 0.6), (int)(width * 0.2), (int)(height * 0.08), 2));
+	buttonList.add(new Button("OPTIONS", (int)(width * 0.5), (int)(height * 0.7), (int)(width * 0.2), (int)(height * 0.08), 2));
 	buttonList.add(new Button("HIGHSCORE", (int)(width * 0.85), (int)(height * 0.9), (int)(width * 0.2), (int)(height * 0.08), 3));
 	buttonList.add(new Button("CREDITS", (int)(width * 0.15), (int)(height * 0.9), (int)(width * 0.2), (int)(height * 0.08), 4));
-	buttonList.add(new Button("EXIT", (int)(width * 0.5), (int)(height * 0.7), (int)(width * 0.2), (int)(height * 0.08), 5));
+	buttonList.add(new Button("EXIT", (int)(width * 0.5), (int)(height * 0.8), (int)(width * 0.2), (int)(height * 0.08), 5));
+	buttonList.add(new Button("CPU BATTLE", (int)(width * 0.5), (int)(height * 0.6), (int)(width * 0.2), (int)(height * 0.08), 6));
 
 }
 
@@ -152,11 +154,27 @@ void draw() {
  	if (gameState == 0) {
  		displayMenu();
  	} else if (gameState == 1) {
- 		if (gameVersion == 1) {
+ 		if (gameVersion == 0) {
  			if (triggerServe) {
  				displayCountDown();
  			} else {
- 				playGame();
+ 				playGame1P();
+ 				checkForWinner();
+ 			}
+ 		} else if (gameVersion == 1) {
+ 			if (triggerServe) {
+ 				displayCountDown();
+ 			} else {
+ 				playGame2P();
+ 				checkForWinner();
+ 			}
+ 		} else if (gameVersion == 5) {
+ 			exit();
+ 		} else if (gameVersion == 6) {
+ 			if (triggerServe) {
+ 				displayCountDown();
+ 			} else {
+ 				playGame0P();
  				checkForWinner();
  			}
  		}
@@ -166,11 +184,29 @@ void draw() {
 
 }
 
-// Logic to call to simply play the game
-void playGame() {
+// Logic to play a 0 player game
+void playGame0P() {
 	displayGame();
 	ball.move();
-	paddleMovement();
+	paddleMovement0P();
+	detectCollision();
+	checkPointScored();
+}
+
+// Logic to play a 1 player game
+void playGame1P() {
+	displayGame();
+	ball.move();
+	paddleMovement1P();
+	detectCollision();
+	checkPointScored();
+}
+
+// Logic to play a 2 player game
+void playGame2P() {
+	displayGame();
+	ball.move();
+	paddleMovement2P();
 	detectCollision();
 	checkPointScored();
 }
@@ -190,13 +226,9 @@ void displayMenu() {
 		for (int i = 0; i < buttonList.size(); i++) {
 			if (buttonList.get(i).checkPressed()) {
 				gameVersion = buttonList.get(i)._instruction;
-
 				System.out.println("Version" + gameVersion);
-				
 				gameState = 1;
-
 				System.out.println("State" + gameState);
-
 				return;
 			}
 		}
@@ -260,7 +292,53 @@ void displayEndgame() {
 }
 
 // Logic to move the player paddles
-void paddleMovement() {
+void paddleMovement0P() {
+	/*
+	The key codes for player movement are as follows:
+	0	:	remain where the paddle is at a.k.a. no movement
+	-1	:	move upwards a.k.a. in the negative y-direction
+	1	:	move downwards a.k.a. in the positive y-direction
+	*/
+
+	if (p1Paddle._yCord > ball._yCord && p1Paddle._yCord - p1Paddle._height / 2 > level._yCordTopRail + level._railHeight / 2) {
+		p1Paddle.move(-1);
+	}
+	if (p1Paddle._yCord < ball._yCord && p1Paddle._yCord + p1Paddle._height / 2 < level._yCordBottomRail - level._railHeight / 2) {
+		p1Paddle.move(1);
+	}
+	if (p2Paddle._yCord > ball._yCord && p2Paddle._yCord - p2Paddle._height / 2 > level._yCordTopRail + level._railHeight / 2) {
+		p2Paddle.move(-1);
+	}
+	if (p2Paddle._yCord < ball._yCord && p2Paddle._yCord + p2Paddle._height / 2 < level._yCordBottomRail - level._railHeight / 2) {
+		p2Paddle.move(1);
+	}
+}
+
+// Logic to move the player paddles
+void paddleMovement1P() {
+	/*
+	The key codes for player movement are as follows:
+	0	:	remain where the paddle is at a.k.a. no movement
+	-1	:	move upwards a.k.a. in the negative y-direction
+	1	:	move downwards a.k.a. in the positive y-direction
+	*/
+
+	if (p1UP == true && p1Paddle._yCord - p1Paddle._height / 2 > level._yCordTopRail + level._railHeight / 2) {
+		p1Paddle.move(-1);
+	}
+	if (p1DOWN == true && p1Paddle._yCord + p1Paddle._height / 2 < level._yCordBottomRail - level._railHeight / 2) {
+		p1Paddle.move(1);
+	}
+	if (p2Paddle._yCord > ball._yCord && p2Paddle._yCord - p2Paddle._height / 2 > level._yCordTopRail + level._railHeight / 2) {
+		p2Paddle.move(-1);
+	}
+	if (p2Paddle._yCord < ball._yCord && p2Paddle._yCord + p2Paddle._height / 2 < level._yCordBottomRail - level._railHeight / 2) {
+		p2Paddle.move(1);
+	}
+}
+
+// Logic to move the player paddles
+void paddleMovement2P() {
 	/*
 	The key codes for player movement are as follows:
 	0	:	remain where the paddle is at a.k.a. no movement

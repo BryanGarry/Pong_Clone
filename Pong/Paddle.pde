@@ -25,6 +25,14 @@ public class Paddle {
 		}
 	}
 
+	void moveAI(int ballY) {
+		if (ballY > _yCord) {
+			_yCord += _velocity;
+		} else if (ballY < _yCord) {
+			_yCord -= _velocity;
+		}
+	}
+
 	// Constructors
 	public Paddle() {}
 
