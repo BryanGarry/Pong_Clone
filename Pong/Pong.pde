@@ -59,6 +59,9 @@ int ballPosX;
 
 Level level;
 
+boolean restartGame;
+boolean quitGame;
+
 int gameState;
 int gameVersion;
 boolean roundStart;
@@ -169,7 +172,12 @@ void draw() {
  			}
  		}
  	} else if (gameState == 2) {
-
+ 		// Display the option to restart that game
+ 		textSize(50);
+		text("PRESS 'r' TO RESTART", (int)(width * 0.5), (int)(height * 0.65));
+		text("PRESS 'q' TO RESTART", (int)(width * 0.5), (int)(height * 0.75));
+		checkForRestart();
+		checkForQuit();
  	}
 
 }
@@ -446,6 +454,51 @@ void checkForWinner() {
 	}
 }
 
+// Function that checks to see if the user wants to restart the game
+void checkForRestart() {
+	if (restartGame == true) {
+		reset();
+	}
+}
+
+// Function that checks to see if the user wants to quit the game
+void checkForQuit() {
+	if (quitGame == true) {
+		exit();
+	}
+}
+
+// Function that resets all the initial values from setup
+void reset() {
+	int p1PosX = (int)(width * 0.2);
+  	int p2PosX = (int)(width * 0.8);
+  	int startPosY = (int)(height * 0.55);
+  	int ballPosX = (int)(width * 0.5);
+
+  	// Create paddles, ball, and level objects
+	p1Paddle = new Paddle(p1PosX, startPosY, 20, 100);
+	p2Paddle = new Paddle(p2PosX, startPosY, 20, 100);
+	ball = new Ball(ballPosX, startPosY, 25);
+	level = new Level();
+
+	// Set game state equal to 0 to load the menu UI
+	gameState = 0;
+
+	// Set the default serve to the player 1
+	serve = 1;
+	triggerServe = true;
+
+	// Set the volley count to 0
+	volleyCount = 0;
+
+	// Set players scores to 0
+	p1Score = 0;
+	p2Score = 0;
+
+	// Set the winning score
+	winningScore = 3;
+}
+
 public void keyPressed() {
 	if (key == 'w') {
 		p1UP = true;
@@ -458,6 +511,12 @@ public void keyPressed() {
 	}
 	if (key == 'l') {
 		p2DOWN = true;
+	}
+	if (key == 'r') {
+		restartGame = true;
+	}
+	if (key == 'q') {
+		quitGame = true;
 	}
 }
 
@@ -473,5 +532,11 @@ public void keyReleased() {
 	}
 	if (key == 'l') {
 		p2DOWN = false;
+	}
+	if (key == 'r') {
+		restartGame = false;
+	}
+	if (key == 'q') {
+		quitGame = false;
 	}
 }
