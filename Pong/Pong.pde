@@ -34,6 +34,13 @@ import java.util.*;
 	1	:	Serve player 1
 	2	: 	Serve player 2
 
+	The integer playerHitting is being used to determine which player is supposed to hit the ball next, this is 
+	meant to prevent double hits from happening in case the ball is moving at too steep and angle
+
+	0	:	No player hitting
+	1	:	Player 1 hitting
+	2	:	Player 2 hitting
+
  	*/
 
 // Variables
@@ -58,6 +65,7 @@ int startPosY;
 int ballPosX;
 
 Level level;
+int playerHitting;
 
 boolean restartGame;
 boolean quitGame;
@@ -102,8 +110,11 @@ void setup() {
 	serve = 1;
 	triggerServe = true;
 
+	// Set the default player to hit the ball to player 1
+	playerHitting = 1;
+
 	// Set the maxBallSpeed
-	maxBallSpeed = 7;
+	maxBallSpeed = 6;
 
 	// Set the volley count to 0
 	volleyCount = 0;
@@ -143,41 +154,14 @@ void draw() {
  	} else if (gameState == 1) {
  		if (gameVersion == 1) {
  			if (triggerServe) {
- 				displayGame(); // Display game
-
- 				// Get serve direction and set timer for countdown as well as the starting positions of the paddles and balls
- 				if (serve != 0) {
- 					startRound();
- 					timer._time = 1.0;
- 				}
-
- 				// If timer is still running, proceed to display the countdown, once timer ends, switch to regular gameplay
- 				if (timer._time > 0) {
- 					textSize(150);
- 					fill(0);
- 					if (timer._time > 0.67) {
- 						text("3", (int)(width * 0.33), (int)(height * 0.35));
- 					} else if (timer._time > 0.33) {
- 						text("2", (int)(width * 0.5), (int)(height * 0.35));
- 					} else {
- 						text("1", (int)(width * 0.67), (int)(height * 0.35));
- 					}
- 					timer.countDown();
- 				} else {
- 					triggerServe = false;
- 				}
+ 				displayCountDown();
  			} else {
  				playGame();
  				checkForWinner();
  			}
  		}
  	} else if (gameState == 2) {
- 		// Display the option to restart that game
- 		textSize(50);
-		text("PRESS 'r' TO RESTART", (int)(width * 0.5), (int)(height * 0.65));
-		text("PRESS 'q' TO RESTART", (int)(width * 0.5), (int)(height * 0.75));
-		checkForRestart();
-		checkForQuit();
+ 		displayEndgame();
  	}
 
 }
@@ -238,6 +222,43 @@ void displayGame() {
 	level.show();
 }
 
+// Function that plays the countdown at the start of a new game
+void displayCountDown() {
+	displayGame(); // Display game
+
+	// Get serve direction and set timer for countdown as well as the starting positions of the paddles and balls
+	if (serve != 0) {
+		startRound();
+		timer._time = 1.0;
+	}
+
+	// If timer is still running, proceed to display the countdown, once timer ends, switch to regular gameplay
+	if (timer._time > 0) {
+		textSize(150);
+		fill(0);
+		if (timer._time > 0.67) {
+			text("3", (int)(width * 0.33), (int)(height * 0.35));
+		} else if (timer._time > 0.33) {
+			text("2", (int)(width * 0.5), (int)(height * 0.35));
+		} else {
+			text("1", (int)(width * 0.67), (int)(height * 0.35));
+		}
+		timer.countDown();
+	} else {
+		triggerServe = false;
+	}
+}
+
+// Function that displays the end game dialogue
+void displayEndgame() {
+	// Display the option to restart that game
+	textSize(50);
+	text("PRESS 'r' TO RESTART", (int)(width * 0.5), (int)(height * 0.65));
+	text("PRESS 'q' TO RESTART", (int)(width * 0.5), (int)(height * 0.75));
+	checkForRestart();
+	checkForQuit();
+}
+
 // Logic to move the player paddles
 void paddleMovement() {
 	/*
@@ -296,7 +317,7 @@ void detectCollision() {
 
 
 	// Player 1 paddle collision detection and reflection
-	if (ball._xCord - ball._radius / 2 <= p1Paddle._xCord + p1Paddle._width / 2) {
+	if (ball._xCord - ball._radius / 2 <= p1Paddle._xCord + p1Paddle._width / 2 && playerHitting == 1) {
 		if (ball._yCord > p1Paddle._yCord - p1Paddle._height / 2 && ball._yCord < p1Paddle._yCord + p1Paddle._height / 2) {
 			// Find the difference between the paddle center and the ball center and change the angle of the ball accordingly.
 			// Add this raw value to the newly calculated angle and then check to make sure the angle is still within the correct bounds.
@@ -318,16 +339,24 @@ void detectCollision() {
 			}
 			ball.normalizeAngle();
 
+			// Check that the ball is within the bounds of the acceptable return angles: 0 - 90 and 270 - 360
+			if (ball._angleDeg < 285 && ball._angleDeg > 180) {
+				ball._angleDeg = -75;
+			} else if (ball._angleDeg > 75 && ball._angleDeg < 180) {
+				ball._angleDeg = 75;
+			}
+
 			// Increase volley count
 			volleyCount++;
 			checkVolleyCount();
+			playerHitting = 2;
 
 			System.out.println("Outgoing Angle: " + ball._angleDeg);
 		}
 	}
 
 	// Player 2 paddle collison detection and reflection
-	if (ball._xCord + ball._radius / 2 >= p2Paddle._xCord - p2Paddle._width / 2) {
+	if (ball._xCord + ball._radius / 2 >= p2Paddle._xCord - p2Paddle._width / 2 && playerHitting == 2) {
 		if (ball._yCord > p2Paddle._yCord - p2Paddle._height / 2 && ball._yCord < p2Paddle._yCord + p2Paddle._height / 2) {
 			// Find the difference between the paddle center and the ball center and change the angle of the ball accordingly.
 			// Add this raw value to the newly calculated angle and then check to make sure the angle is still within the correct bounds.
@@ -349,9 +378,17 @@ void detectCollision() {
 			}
 			ball.normalizeAngle();
 
+			// Check that the ball is within the bounds of the acceptable return angles: 115 - 255
+			if (ball._angleDeg < 115) {
+				ball._angleDeg = 115;
+			} else if (ball._angleDeg > 255) {
+				ball._angleDeg = 255;
+			}
+
 			// Increase volley count
 			volleyCount++;
 			checkVolleyCount();
+			playerHitting = 1;
 
 			System.out.println("Outgoing Angle: " + ball._angleDeg);
 		}
@@ -366,6 +403,7 @@ void checkPointScored() {
 	if (ball._xCord + ball._radius / 2 > p2Paddle._xCord) {
 		p1Score++;
 		serve = 2;
+		playerHitting = 2;
 		resetRound();
 	}
 
@@ -374,20 +412,23 @@ void checkPointScored() {
 	if (ball._xCord - ball._radius / 2 < p1Paddle._xCord) {
 		p2Score++;
 		serve = 1;
+		playerHitting = 1;
 		resetRound();
 	}
 }
 
 // Function that checks the volley count and increases the ball speed depending on the number of volleys
 void checkVolleyCount() {
-	if (volleyCount == 3) {
-		ball._velocity += 0.5;
-	} else if (volleyCount == 8) {
-		ball._velocity += 1.0;
-	} else if (volleyCount == 15) {
-		ball._velocity += 1.0;
-	} else {
-		return;
+	if (ball._velocity < maxBallSpeed) {
+		if (volleyCount == 3) {
+			ball._velocity += 0.5;
+		} else if (volleyCount == 7) {
+			ball._velocity += 1.0;
+		} else if (volleyCount == 15) {
+			ball._velocity += 1.0;
+		} else {
+			ball._velocity += 0.1;
+		}
 	}
 }
 
@@ -487,6 +528,7 @@ void reset() {
 	// Set the default serve to the player 1
 	serve = 1;
 	triggerServe = true;
+	playerHitting = 1;
 
 	// Set the volley count to 0
 	volleyCount = 0;

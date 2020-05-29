@@ -28,13 +28,8 @@ public class Ball {
 
 	void calculateVelocityComponents() {
 		_angleRad = radians(_angleDeg);
-		//System.out.println("angle: " + _angleDeg);
-		//_xVelocity = (int) (cos(_angleRad) * _velocity);
 		_xVelocity = cos(_angleRad) * _velocity;
-		//System.out.println("vX: " + _xVelocity);
-		//_yVelocity = (int) (sin(_angleRad) * _velocity);
 		_yVelocity = sin(_angleRad) * _velocity;
-		//System.out.println("vY: " + _yVelocity);
 	}
 
 	void normalizeAngle() {
@@ -48,10 +43,10 @@ public class Ball {
 	}
 
 	void checkAngleRange(int lowerLimit, int upperLimit) {
-		if (ball._angleDeg < lowerLimit + 10) {
-			ball._angleDeg = lowerLimit + 10;
-		} else if (ball._angleDeg > upperLimit - 10) {
-			ball._angleDeg = upperLimit - 10;
+		if (ball._angleDeg < lowerLimit + 25) {
+			ball._angleDeg = lowerLimit + 25;
+		} else if (ball._angleDeg > upperLimit - 25) {
+			ball._angleDeg = upperLimit - 25;
 		}
 	}
 
