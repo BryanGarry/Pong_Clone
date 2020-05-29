@@ -517,6 +517,8 @@ void drawPlayerScores() {
 	text(p1Score, (int)(width * 0.2), (int)(height * 0.12));
 	text("Player 2:", (int)(width * 0.8), (int)(height * 0.04));
 	text(p2Score, (int)(width * 0.8), (int)(height * 0.12));
+	text("Volley:", (int)(width * 0.5), (int)(height * 0.04));
+	text(volleyCount, (int)(width * 0.5), (int)(height * 0.12));
 }
 
 // Function that resets are the necessary values at the end of the round
